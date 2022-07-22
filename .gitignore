@@ -21,6 +21,8 @@ venv
 docs.zip
 archive.zip
 
+# Project-specific files
 fvd.db
 fvd.db-journal
 .venv
+data_files/
