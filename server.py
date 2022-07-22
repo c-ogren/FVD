@@ -23,6 +23,7 @@ db = DBInstance('fvd.db')
 db.createConnection()
 db.createTable()
 
+
 @app.post('/lookup')
 async def lookup(vehicle: Vehicle):
     # VIN needs to have EXACTLY 17 alphanumeric chars
@@ -62,11 +63,12 @@ async def lookup(vehicle: Vehicle):
             )
             insert_error = db.insertCache(v_tuple)
             if(insert_error):
+                # Return 500 since this is a serverside error, not a client error.
                 raise HTTPException(status_code=500, detail=' '.join(insert_error.args)) 
     else:
         # Return the cached Vehicle
         v_return = {
-            "vin": cached[0][1], # primary key id is 1
+            "vin": cached[0][1], # primary key id is cached[0][0]
             "make": cached[0][2],
             "model": cached[0][3],
             "year": cached[0][4],
@@ -76,6 +78,7 @@ async def lookup(vehicle: Vehicle):
 
     # db.checkAll() # Check database rows
     return v_return
+
 
 @app.post('/remove')
 async def remove(vehicle: Vehicle):
@@ -107,10 +110,12 @@ async def remove(vehicle: Vehicle):
             }
 
 
-
 @app.get('/export')
 async def export():
+    # Return the file to the client.
+    # If you visit http://localhost:{port}/export in any browser, you can download the parquet.
     e_cache = db.exportCache()
     if(e_cache):
+        # Return 500 since this is a serverside error, not a client error.
         raise HTTPException(status_code=500, detail=' '.join(e_cache.args))
     return FileResponse('data_files/db_cache.parquet')

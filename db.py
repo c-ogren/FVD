@@ -28,7 +28,7 @@ class DBInstance:
             self.connection = sqlite3.connect(self.db_name)
             return None
         except Error as e:
-            print("Could not create a Sqlite connection")
+            print("Could not create a Sqlite connection", e)
             return e
     
     def createTable(self):
@@ -38,6 +38,7 @@ class DBInstance:
             curs.execute("CREATE TABLE IF NOT EXISTS Vehicles (id integer primary key, Vin varchar unique, Make varchar, Model varchar, Year varchar, Class varchar)")
             return None
         except Error as e:
+            print("Could not create Vehicle table", e)
             return e
     
     def checkCache(self, vin):
@@ -92,6 +93,14 @@ class DBInstance:
             return e
     
     def exportCache(self):
+        """
+        Writes the existing cache as parquet format to /data_files/db_cache.parquet.
+        Upon fetching from the cache, convert the array of tuples to numpy arrays. The numpy array will then
+        need to be converted to a parquet table. Lastly, write the parquet table to a file.
+
+        Returns:
+            None. If there was any error related to the Sqlite transaction or the parquet conversion, return the error
+        """
         try:
             curs = self.connection.cursor()
             curs.execute("SELECT * FROM Vehicles")
