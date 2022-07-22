@@ -1,0 +1,130 @@
+{
+	"info": {
+		"_postman_id": "d51505d5-a6ee-4949-84e0-26a83a2a11cf",
+		"name": "FVD_Testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15234439"
+	},
+	"item": [
+		{
+			"name": "lookup",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"vin\": \"{{randomVin}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/lookup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"lookup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "remove",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"vin\": \"{{randomVin}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/remove",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"remove"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "export",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/export",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"export"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"function randomVin() {",
+					"    // Feel free to add VIN's here!",
+					"    let vins = [",
+					"    \"1XPWD40X1ED215307\",",
+					"    \"1XKWDB0X57J211825\",",
+					"    \"1XP5DB9X7YN526158\",",
+					"    \"4V4NC9EJXEN171694\",",
+					"    \"1XP5DB9X7XD487964\"",
+					"    ]",
+					"    let v = vins[Math.floor((Math.random() * vins.length))]",
+					"    return v",
+					"}",
+					"",
+					"pm.variables.set('randomVin', randomVin())",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

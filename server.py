@@ -6,7 +6,6 @@
 # github: c-ogren
 # -----------------------------------------------------------
 
-from re import A
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -42,6 +41,7 @@ async def lookup(vehicle: Vehicle):
 
         # Raise Error if not a valid VIN
         # VPIC returns a non-zero ErrorCode when a non-valid vin is inserted
+        # Returns a 400 since this is a client error
         if(decodedVin['Results'][0]['ErrorCode'] != '0'):
             raise HTTPException(status_code=400, detail=decodedVin['Results'][0]['ErrorText'])
         else:
@@ -62,7 +62,7 @@ async def lookup(vehicle: Vehicle):
             )
             insert_error = db.insertCache(v_tuple)
             if(insert_error):
-                raise HTTPException(status_code=400, detail=insert_error) 
+                raise HTTPException(status_code=500, detail=' '.join(insert_error.args)) 
     else:
         # Return the cached Vehicle
         v_return = {
@@ -73,7 +73,8 @@ async def lookup(vehicle: Vehicle):
             "class": cached[0][5],
             "cached": True
         }
-    db.checkAll()
+
+    # db.checkAll() # Check database rows
     return v_return
 
 @app.post('/remove')
@@ -84,23 +85,32 @@ async def remove(vehicle: Vehicle):
 
     r_cache = db.removeCache(vehicle.vin)
     
+    # r_cache is the number of rows affected after the removeCache function.
+    # if there was an error, r_cache is an error. Append details to the response for more information
     if(r_cache == 1):
         return {
             "vin" : vehicle.vin,
             "deleteSuccess" : True
         }
     else:
-        return {
-            "vin" : vehicle.vin,
-            "deleteSuccess" : False,
-            "details" : r_cache
-        }
+        if not isinstance(r_cache, int):
+            return {
+                "vin" : vehicle.vin,
+                "deleteSuccess" : False,
+                "details" : ' '.join(r_cache.args) # r_cache is an error, so we need to join the array of strings
+            }
+        else:
+            return {
+                "vin" : vehicle.vin,
+                "deleteSuccess" : False,
+                "details" : 'VIN not found'
+            }
+
 
 
 @app.get('/export')
 async def export():
     e_cache = db.exportCache()
-    print(e_cache.args)
     if(e_cache):
-        raise HTTPException(status_code=500, detail=e_cache.args[1])
+        raise HTTPException(status_code=500, detail=' '.join(e_cache.args))
     return FileResponse('data_files/db_cache.parquet')

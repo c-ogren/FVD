@@ -1,5 +1,7 @@
 # -----------------------------------------------------------
 # Database logic code for the FASTAPI VIN Decoder
+# Note: All DB transactions are wrapped in a try/catch block 
+# to catch any sqlite errors.
 #
 # Curtis Ogren
 # email: ceogren@alumni.stanford.edu
@@ -15,11 +17,13 @@ import pyarrow.parquet as pq
 
 class DBInstance:
     def __init__(self, db="fvd.db") -> None:
+        """Take the filename of the db, initialize connection variables"""
         super().__init__()
         self.connection = None
         self.db_name = db
 
     def createConnection(self):
+        """Open a file for db writing, create a connection property within the DBInstance class"""
         try:
             self.connection = sqlite3.connect(self.db_name)
             return None
@@ -28,6 +32,7 @@ class DBInstance:
             return e
     
     def createTable(self):
+        """Create the Vehicles table witin the FVD db if there is none"""
         try:   
             curs = self.connection.cursor()
             curs.execute("CREATE TABLE IF NOT EXISTS Vehicles (id integer primary key, Vin varchar unique, Make varchar, Model varchar, Year varchar, Class varchar)")
@@ -70,6 +75,7 @@ class DBInstance:
         """
         Removes vehicle entry in the cached Sqlite database
         The vehicle information is deleted if and only if the db contains the vehicle's VIN.
+        Returns the row count, because if the requested vin was not deleted, the delete was unsuccessful for the requested VIN.
 
         Parameters: 
             vin (int): Vehicle identification number
@@ -109,7 +115,6 @@ class DBInstance:
             pq.write_table(p_table, "data_files/db_cache.parquet")
             return None
         except Exception as e:
-            print(e)
             return e
     
     def checkAll(self):
