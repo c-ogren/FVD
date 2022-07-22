@@ -16,7 +16,12 @@ uvicorn main:app --reload
 ```
 This will by default run the applciation on port 8000
 
-TODO: PRODUCTION?
+### Production
+If you want to run the application in production, it is suggested have nginx proxy the FVD server.
+This is because nginx is good at handling load. You will need to create a custom http block for the server
+to forward the nginx port to the running FVD port. 
+
+In addition, you will have to set up GUnicorn to run and manage running Uvicorn in a production setting.
 
 # :file_folder: File Structure
 ## /tests
