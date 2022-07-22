@@ -16,7 +16,7 @@ pip install -r requirements.txt
 # :gear: Running the server
 In order to run the FastAPI server in development mode, run:
 ```
-uvicorn main:app --reload
+uvicorn server:app --reload
 ```
 This will by default run the applciation on port 8000
 
