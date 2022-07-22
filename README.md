@@ -6,6 +6,10 @@ Author: Curtis Ogren
 # :green_circle: Get Started
 Make sure to install virtual environment dependencies:
 ```
+git clone https://github.com/c-ogren/FVD.git
+cd FVD
+py -m venv .venv
+.\.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
