@@ -57,7 +57,7 @@ data: {
 ```
 On the contrary to ```/lookup```, sends a VIN to the API to be removed from the cache. The route first
 checks if the VIN is valid, then attempts to remove the VIN from the cache. All API responses return ```VIN```
-and ```deleteSucces``` properties. If the number of affected rows in the database is 1 (upon deletion), return a
+and ```deleteSuccess``` properties. If the number of affected rows in the database is 1 (upon deletion), return a
 succesful delete. If no rows were affected or the database failed for any reason, return an unsucessful
 delete and details:
 ```
