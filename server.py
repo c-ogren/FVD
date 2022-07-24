@@ -34,7 +34,9 @@ async def lookup(vehicle: Vehicle):
 
     # Check sqlite3 db if the VIN exists
     cached = db.checkCache(vehicle.vin)
-
+    # Check if database error returned from checkCache
+    if not isinstance(cached, list):
+        raise HTTPException(status_code=500, detail=' '.join(cached.args))
     # Check if the cached db returns any hits
     if(len(cached) == 0):
         r = requests.get(f'https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/{vehicle.vin}?format=json')

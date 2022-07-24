@@ -32,10 +32,18 @@ class DBInstance:
             return e
     
     def createTable(self):
-        """Create the Vehicles table witin the FVD db if there is none"""
+        """
+        Create the Vehicles table witin the FVD db if there is none.
+
+        First row is id (primary key). ID's are a nice-to-have in database design.
+        Vin's are the second data column. They are a unique to prevent any duplicate insertions from any developer.
+        Any duplicate insertions of a VIN will return a unique violation error.
+        The rest pertain to the decoded VIN.
+        """
         try:   
             curs = self.connection.cursor()
             curs.execute("CREATE TABLE IF NOT EXISTS Vehicles (id integer primary key, Vin varchar unique, Make varchar, Model varchar, Year varchar, Class varchar)")
+            self.connection.commit()
             return None
         except Error as e:
             print("Could not create Vehicle table", e)
@@ -50,9 +58,12 @@ class DBInstance:
         Returns:
             [()] array of length one, containing a tuple of vehicle details
         """
-        curs = self.connection.cursor()
-        curs.execute("SELECT * FROM Vehicles WHERE Vin=?", (vin,))
-        return curs.fetchall()
+        try:    
+            curs = self.connection.cursor()
+            curs.execute("SELECT * FROM Vehicles WHERE Vin=?", (vin,))
+            return curs.fetchall()
+        except Error as e:
+            return e
 
     def insertCache(self, v_tuple):
         """
